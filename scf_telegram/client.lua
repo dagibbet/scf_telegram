@@ -5,14 +5,14 @@ function TogglePost(name)
     InMenu = true
     SetNuiFocus(true, true)
     SendNUIMessage({ type = 'openGeneral', postname = name })
-    TriggerServerEvent('scf_telegram:check_inbox', GetPlayers())
+    TriggerServerEvent('scf_telegram:check_inbox')
 end
 
 function TogglePostPD(name)
     InMenu = true
     SetNuiFocus(true, true)
     SendNUIMessage({ type = 'openGeneral', postname = name })
-    TriggerServerEvent('scf_telegram:check_inboxPD', GetPlayers())
+    TriggerServerEvent('scf_telegram:check_inboxPD')
 end
 
 Citizen.CreateThread(function()
@@ -93,6 +93,13 @@ function GetPlayers()
 	return players
 end
 
+RegisterNUICallback('scf_telegram-refreshPost', function()
+	TriggerServerEvent('scf_telegram-check_inbox')
+end)
+
+RegisterNUICallback('scf_telegram-refreshPDPost', function()
+	TriggerServerEvent('scf_telegram-check_inboxPD')
+end)
 
 RegisterNUICallback('getview', function(data)
     TriggerServerEvent('scf_telegram:getTelegram', tonumber(data.id))
@@ -106,14 +113,15 @@ RegisterNUICallback('delete', function(data)
     TriggerServerEvent("scf_telegram:DeleteTelegram", tonumber(data.id))
 end)
 
-RegisterNetEvent('messageData')
-AddEventHandler('messageData', function(tele)
+RegisterNetEvent('scf_telegram:client:messageData')
+AddEventHandler('scf_telegram:client:messageData', function(tele)
     SendNUIMessage({ type = 'view', telegram = tele })
 end)
 
-RegisterNetEvent('inboxlist')
-AddEventHandler('inboxlist', function(data)
+RegisterNetEvent('scf_telegram:client:inboxlist')
+AddEventHandler('scf_telegram:client:inboxlist', function(data)
     SendNUIMessage({ type = 'inboxlist', response = data })
+	--print(data.box)
 end)
 
 RegisterNUICallback('NUIFocusOff', function()

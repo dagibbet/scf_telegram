@@ -12,7 +12,7 @@ function loadInbox(list){
             }
         });
     }else{
-        $(".inboxContainer").text("No telegram")
+        $(".inboxList").text("No telegrams")
     }
 }
 //Close view Or compose
@@ -20,6 +20,14 @@ $(".close_view").on("click", function () {
     $(".view").fadeOut().hide();
     $(".compose").fadeOut().hide();
     $(".inbox").fadeIn().show();
+	switch (box) {
+		case "ANON":
+			$.post('scf_telegram-check_inboxPD');
+			break;
+		default: 
+			$.post('scf_telegram-check_inbox');
+			break;
+	}
 });
 //Compose button
 $(".composetelegram").on("click",function(){
@@ -49,9 +57,18 @@ $("#composeForm").submit(function(e){
     $(".compose").fadeOut().hide();
     //Show inbox
     $(".inbox").fadeIn().show();
+	switch (box) {
+		case "ANON":
+			$.post('scf_telegram-check_inboxPD');
+			break;
+		default: 
+			$.post('scf_telegram-check_inbox');
+			break;
+	}
+	
 
 });
-
+var box = ""
 $(function () {
     window.addEventListener('message', function (event) {
         if (event.data.type === "openGeneral") {
@@ -71,7 +88,10 @@ $(function () {
             $("#view_message").text(event.data.telegram.message)
         }
         if(event.data.type === "inboxlist"){
-            loadInbox(event.data.response.list);
+			var msglist = event.data.response.list
+			
+			box = event.data.response.box
+            loadInbox(msglist);
             $('#firstname').text(event.data.response.firstname);
             $("#postbox").text(event.data.response.box)
         }
@@ -97,6 +117,14 @@ $(".telegram_delete_button").click(function(event){
     $.post('http://scf_telegram/delete', JSON.stringify({id: itemToDel}));
     $(".inbox").fadeIn().show();
     $(".view").fadeOut().hide();
+	switch (box) {
+		case "ANON":
+			$.post('scf_telegram-check_inboxPD');
+			break;
+		default: 
+			$.post('scf_telegram-check_inbox');
+			break;
+	}
 });
 
 document.keyup = function (data) {
